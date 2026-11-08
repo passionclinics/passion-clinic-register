@@ -17,8 +17,7 @@ const CONFIG = {
    * While this is empty the form will NOT pretend to save anything;
    * it shows an error message instead.
    */
-  ENDPOINT_URL: "https://script.google.com/macros/s/AKfycbxr6jyzBmzQOJKuuNTfE6n5TdD-iV2QRAO5Kw6lvFc5aXYrjiEiijLtJwVBAfz7oOsa/exec
-",
+  ENDPOINT_URL: https://script.google.com/macros/s/AKfycbxr6jyzBmzQOJKuuNTfE6n5TdD-iV2QRAO5Kw6lvFc5aXYrjiEiijLtJwVBAfz7oOsa/exec
 
   /** Abort the request if the flow does not answer in time (ms). */
   REQUEST_TIMEOUT_MS: 25000,
