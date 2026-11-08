@@ -92,6 +92,7 @@ const CONFIG = {
       newEntry: "طلب جديد",
       langSwitch: "English",
       contactTitle: "أو تواصل معنا مباشرة",
+      multiHint: "(يمكن اختيار أكثر من خدمة)",
       whatsapp: "تواصل عبر واتساب",
       call: "اتصل بنا",
       // validation
@@ -100,7 +101,7 @@ const CONFIG = {
       errMobileRequired: "يرجى إدخال رقم الجوال.",
       errMobileInvalid: "رقم الجوال غير صحيح. يجب أن يبدأ بـ 5 ويتكون من 9 أرقام (مثال: 05XXXXXXXX).",
       errEmailInvalid: "صيغة البريد الإلكتروني غير صحيحة.",
-      errService: "يرجى اختيار الخدمة المطلوبة.",
+      errService: "يرجى اختيار خدمة واحدة على الأقل.",
       errDay: "يرجى اختيار اليوم المناسب للتواصل.",
       errTime: "يرجى اختيار الوقت المناسب للتواصل.",
       errConsent: "يرجى تأكيد البيانات لإتمام الطلب.",
@@ -138,6 +139,7 @@ const CONFIG = {
       newEntry: "New request",
       langSwitch: "العربية",
       contactTitle: "Or contact us directly",
+      multiHint: "(you can select more than one)",
       whatsapp: "Chat on WhatsApp",
       call: "Call us",
       errNameRequired: "Please enter your full name.",
@@ -145,7 +147,7 @@ const CONFIG = {
       errMobileRequired: "Please enter your mobile number.",
       errMobileInvalid: "Invalid Saudi mobile number. It must start with 5 and have 9 digits (e.g. 05XXXXXXXX).",
       errEmailInvalid: "Please enter a valid email address.",
-      errService: "Please select the requested service.",
+      errService: "Please select at least one service.",
       errDay: "Please select a preferred contact day.",
       errTime: "Please select a preferred contact time.",
       errConsent: "Please confirm your details to continue.",
@@ -277,18 +279,50 @@ const CONFIG = {
     }
   }
 
-  /** Ad links can preselect a service: index.html?service=إزالة الشعر بالليزر */
+  let userPickedService = false;
+
+  /** Selected services (array of values). */
+  function selectedServices() {
+    return Array.from(els.service.querySelectorAll('input[type="checkbox"]:checked')).map((c) => c.value);
+  }
+
+  /** Multi-select service chips (keeps current selection when re-rendered). */
+  function renderServiceChips() {
+    const keep = new Set(selectedServices());
+    els.service.innerHTML = "";
+    services.forEach((s, i) => {
+      const label = document.createElement("label");
+      label.className = "chip";
+      const input = document.createElement("input");
+      input.type = "checkbox";
+      input.name = "service";
+      input.value = s.value;
+      input.id = `service-${i}`;
+      input.checked = keep.has(s.value);
+      const box = document.createElement("span");
+      box.className = "chip__box";
+      box.setAttribute("aria-hidden", "true");
+      const text = document.createElement("span");
+      text.textContent = lang === "en" ? (s.en || s.ar) : s.ar;
+      label.append(input, box, text);
+      els.service.appendChild(label);
+    });
+  }
+
+  /** Ad links can preselect services: ?service=إزالة الشعر بالليزر  (several: comma-separated) */
   function applyServiceFromUrl() {
     const wanted = new URLSearchParams(location.search).get("service");
-    if (!wanted || els.service.value) return;
-    const w = wanted.trim().toLowerCase();
-    const match = services.find((s) => [s.value, s.ar, s.en].some((x) => String(x).trim().toLowerCase() === w));
-    if (match) els.service.value = match.value;
+    if (!wanted || userPickedService) return;
+    wanted.split(/[,،]/).map((w) => w.trim().toLowerCase()).filter(Boolean).forEach((w) => {
+      const match = services.find((s) => [s.value, s.ar, s.en].some((x) => String(x).trim().toLowerCase() === w));
+      if (!match) return;
+      const box = Array.from(els.service.querySelectorAll("input")).find((c) => c.value === match.value);
+      if (box) box.checked = true;
+    });
   }
 
   function renderOptions() {
-    fillSelect(els.service, t("chooseService"),
-      services.map((s) => ({ value: s.value, label: lang === "en" ? (s.en || s.ar) : s.ar })));
+    renderServiceChips();
     fillSelect(els.contactDay, t("chooseDay"),
       DAYS.map((d) => ({ value: d.value, label: lang === "en" ? d.en : d.value })));
     fillSelect(els.contactTime, t("chooseTime"),
@@ -324,7 +358,7 @@ const CONFIG = {
       if (!v) return "errMobileRequired";
       return normalizeSaudiMobile(v) ? null : "errMobileInvalid";
     },
-    service() { return els.service.value ? null : "errService"; },
+    service() { return selectedServices().length ? null : "errService"; },
     contactDay() { return els.contactDay.value ? null : "errDay"; },
     contactTime() { return els.contactTime.value ? null : "errTime"; },
     consent() { return els.consent.checked ? null : "errConsent"; }
@@ -419,7 +453,8 @@ const CONFIG = {
       fullName: els.fullName.value.trim().replace(/\s+/g, " "),
       mobile: normalizeSaudiMobile(els.mobile.value),
       email: "",
-      service: els.service.value,
+      service: selectedServices().join("، "),
+      services: selectedServices(),
       contactDay: els.contactDay.value,
       contactTime: els.contactTime.value,
       notes: els.notes.value.trim(),
@@ -439,7 +474,7 @@ const CONFIG = {
     const firstInvalid = validateAll();
     if (firstInvalid) {
       showAlert("errSummary");
-      firstInvalid.focus();
+      (firstInvalid === els.service ? (els.service.querySelector("input") || els.service) : firstInvalid).focus();
       return;
     }
 
@@ -498,9 +533,9 @@ const CONFIG = {
 
     Object.keys(validators).forEach((name) => {
       const el = els[name];
-      const evt = el.tagName === "SELECT" || el.type === "checkbox" ? "change" : "blur";
+      const evt = el.tagName === "SELECT" || el.tagName === "DIV" || el.type === "checkbox" ? "change" : "blur";
       el.addEventListener(evt, () => {
-        if (el.value || el.checked || attempted) validateField(name);
+        if (el.value || el.checked || el.tagName === "DIV" || attempted) validateField(name);
       });
       el.addEventListener("input", () => {
         if (attempted || el.closest(".field").classList.contains("is-invalid")) validateField(name);
@@ -514,6 +549,7 @@ const CONFIG = {
     });
 
     $("newEntryBtn").addEventListener("click", resetForm);
+    els.service.addEventListener("change", () => { userPickedService = true; });
 
     // Snap Pixel: count WhatsApp / call clicks as separate custom events
     const trackClick = (eventName, desc) => {
