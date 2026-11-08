@@ -246,6 +246,68 @@ select option { color: var(--text); }
 .field.is-invalid .phone input { border: 0; }
 .field.is-invalid .field__hint { display: none; }
 
+/* Service chips (multi-select) */
+.field__label {
+  margin: 0 0 10px;
+  font-weight: 600;
+  font-size: .95rem;
+  color: var(--burgundy-dark);
+}
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  outline: none;
+}
+.field .chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  min-height: 46px;
+  padding: 10px 16px;
+  font-weight: 500;
+  font-size: .95rem;
+  color: var(--text);
+  background: #FFFDFC;
+  border: 1.5px solid var(--rose);
+  border-radius: 999px;
+  cursor: pointer;
+  user-select: none;
+  transition: background .2s var(--ease), border-color .2s var(--ease), color .2s var(--ease);
+}
+.chip:hover { border-color: #D5B5B3; }
+.chip input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.chip__box {
+  width: 18px; height: 18px;
+  flex: 0 0 18px;
+  border: 1.5px solid #CDA9A6;
+  border-radius: 6px;
+  background: var(--surface);
+  display: grid;
+  place-items: center;
+  transition: background .2s var(--ease), border-color .2s var(--ease);
+}
+.chip__box::after {
+  content: "";
+  width: 5px; height: 9px;
+  border-right: 2px solid var(--burgundy);
+  border-bottom: 2px solid var(--burgundy);
+  transform: rotate(45deg) scale(0);
+  margin-top: -2px;
+  transition: transform .18s var(--ease);
+}
+.chip:has(input:checked) {
+  background: var(--burgundy);
+  border-color: var(--burgundy);
+  color: #fff;
+}
+.chip input:checked + .chip__box { background: #fff; border-color: #fff; }
+.chip input:checked + .chip__box::after { transform: rotate(45deg) scale(1); }
+.chip input:focus-visible + .chip__box { box-shadow: var(--ring); }
+.field.is-invalid .chip { border-color: var(--error); }
+
 /* Honeypot */
 .hp { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; opacity: 0; pointer-events: none; }
 
