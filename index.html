@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#581B2B" />
+  <meta name="robots" content="noindex" />
+  <title>تسجيل بيانات العميل | Passion Clinics</title>
+  <link rel="icon" type="image/png" href="assets/passion-clinics-logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="page">
+    <div class="lang-bar" id="langBar" hidden>
+      <button type="button" class="lang-toggle" id="langToggle" lang="en">English</button>
+    </div>
+
+    <header class="brand">
+      <img
+        class="brand__logo"
+        src="assets/passion-clinics-logo.png"
+        alt="Passion Clinics – باشن كلينكس"
+        width="447"
+        height="447"
+      />
+      <h1 class="brand__title" data-i18n="title">تسجيل بيانات العميل</h1>
+      <p class="brand__subtitle" data-i18n="subtitle">يرجى تعبئة البيانات التالية.</p>
+    </header>
+
+    <section class="card" aria-labelledby="formTitle">
+      <h2 id="formTitle" class="visually-hidden" data-i18n="title">تسجيل بيانات العميل</h2>
+
+      <div class="alert" id="formAlert" role="alert" aria-live="assertive" hidden></div>
+
+      <form id="registrationForm" novalidate>
+        <fieldset id="formFields" class="fields">
+          <!-- 1. Full name -->
+          <div class="field" data-field="fullName">
+            <label for="fullName">
+              <span data-i18n="fullName">الاسم الكامل</span>
+              <span class="req" aria-hidden="true">*</span>
+            </label>
+            <input id="fullName" name="fullName" type="text" autocomplete="name" maxlength="100"
+                   required aria-describedby="fullName-error" />
+            <p class="field__error" id="fullName-error"></p>
+          </div>
+
+          <div class="row">
+            <!-- 2. Mobile -->
+            <div class="field" data-field="mobile">
+              <label for="mobile">
+                <span data-i18n="mobile">رقم الجوال</span>
+                <span class="req" aria-hidden="true">*</span>
+              </label>
+              <div class="phone" dir="ltr">
+                <span class="phone__code" aria-hidden="true">+966</span>
+                <input id="mobile" name="mobile" type="tel" inputmode="tel" autocomplete="tel"
+                       maxlength="16" placeholder="5X XXX XXXX" required
+                       aria-describedby="mobile-hint mobile-error" />
+              </div>
+              <p class="field__hint" id="mobile-hint" data-i18n="mobileHint">مثال: 05XXXXXXXX أو 5XXXXXXXX</p>
+              <p class="field__error" id="mobile-error"></p>
+            </div>
+
+            <!-- 3. Email (optional) -->
+            <div class="field" data-field="email">
+              <label for="email">
+                <span data-i18n="email">البريد الإلكتروني</span>
+                <span class="opt" data-i18n="optional">(اختياري)</span>
+              </label>
+              <input id="email" name="email" type="email" inputmode="email" autocomplete="email"
+                     maxlength="120" dir="ltr" placeholder="name@example.com"
+                     aria-describedby="email-error" />
+              <p class="field__error" id="email-error"></p>
+            </div>
+          </div>
+
+          <!-- 4. Service -->
+          <div class="field" data-field="service">
+            <label for="service">
+              <span data-i18n="service">الخدمة المطلوبة</span>
+              <span class="req" aria-hidden="true">*</span>
+            </label>
+            <div class="select">
+              <select id="service" name="service" required aria-describedby="service-error"></select>
+            </div>
+            <p class="field__error" id="service-error"></p>
+          </div>
+
+          <div class="row">
+            <!-- 5. Preferred day -->
+            <div class="field" data-field="contactDay">
+              <label for="contactDay">
+                <span data-i18n="contactDay">اليوم المناسب للتواصل</span>
+                <span class="req" aria-hidden="true">*</span>
+              </label>
+              <div class="select">
+                <select id="contactDay" name="contactDay" required aria-describedby="contactDay-error"></select>
+              </div>
+              <p class="field__error" id="contactDay-error"></p>
+            </div>
+
+            <!-- 6. Preferred time -->
+            <div class="field" data-field="contactTime">
+              <label for="contactTime">
+                <span data-i18n="contactTime">الوقت المناسب للتواصل</span>
+                <span class="req" aria-hidden="true">*</span>
+              </label>
+              <div class="select">
+                <select id="contactTime" name="contactTime" required aria-describedby="contactTime-error"></select>
+              </div>
+              <p class="field__error" id="contactTime-error"></p>
+            </div>
+          </div>
+
+          <!-- 7. Notes -->
+          <div class="field" data-field="notes">
+            <label for="notes">
+              <span data-i18n="notes">ملاحظات إضافية</span>
+              <span class="opt" data-i18n="optional">(اختياري)</span>
+            </label>
+            <textarea id="notes" name="notes" rows="4" maxlength="1000"></textarea>
+          </div>
+
+          <!-- Honeypot (hidden from people, catches bots) -->
+          <div class="hp" aria-hidden="true">
+            <label for="website">Website</label>
+            <input id="website" name="website" type="text" tabindex="-1" autocomplete="off" />
+          </div>
+
+          <!-- 8. Consent -->
+          <div class="field field--consent" data-field="consent">
+            <label class="check" for="consent">
+              <input id="consent" name="consent" type="checkbox" required aria-describedby="consent-error" />
+              <span class="check__box" aria-hidden="true"></span>
+              <span class="check__text" data-i18n="consent">أوافق على استخدام بياناتي للتواصل معي بشأن طلبي.</span>
+            </label>
+            <p class="field__error" id="consent-error"></p>
+          </div>
+
+          <button type="submit" class="btn" id="submitBtn">
+            <span class="btn__spinner" aria-hidden="true"></span>
+            <span class="btn__label" id="submitLabel" data-i18n="submit">إرسال البيانات</span>
+          </button>
+        </fieldset>
+      </form>
+
+      <!-- Success state (shown only after the flow confirms the row was saved) -->
+      <div class="success" id="successPanel" hidden tabindex="-1">
+        <div class="success__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="30" height="30"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <h2 class="success__title" data-i18n="successTitle">تم استلام بياناتك بنجاح</h2>
+        <p class="success__text" data-i18n="successText">شكرًا لك، سيتم التواصل معك في الوقت الذي اخترته.</p>
+        <button type="button" class="btn btn--ghost" id="newEntryBtn" data-i18n="newEntry">تسجيل جديد</button>
+      </div>
+    </section>
+
+    <footer class="foot">© <span id="year"></span> Passion Clinics</footer>
+  </main>
+
+  <script src="script.js" defer></script>
+</body>
+</html>
