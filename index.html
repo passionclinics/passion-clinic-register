@@ -81,13 +81,13 @@
 
           <!-- 4. Service -->
           <div class="field" data-field="service">
-            <label for="service">
+            <p class="field__label" id="service-label">
               <span data-i18n="service">الخدمة المطلوبة</span>
               <span class="req" aria-hidden="true">*</span>
-            </label>
-            <div class="select">
-              <select id="service" name="service" required aria-describedby="service-error"></select>
-            </div>
+              <span class="opt" data-i18n="multiHint">(يمكن اختيار أكثر من خدمة)</span>
+            </p>
+            <div class="chips" id="service" role="group" aria-labelledby="service-label"
+                 aria-describedby="service-error" tabindex="-1"></div>
             <p class="field__error" id="service-error"></p>
           </div>
 
