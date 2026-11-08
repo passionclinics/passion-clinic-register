@@ -66,8 +66,8 @@ const CONFIG = {
 
   const I18N = {
     ar: {
-      pageTitle: "تسجيل بيانات العميل | Passion Clinics",
-      title: "تسجيل بيانات العميل",
+      pageTitle: "طلب حجز موعد | Passion Clinics",
+      title: "طلب حجز موعد",
       subtitle: "يرجى تعبئة البيانات التالية.",
       fullName: "الاسم الكامل",
       mobile: "رقم الجوال",
@@ -78,7 +78,7 @@ const CONFIG = {
       contactDay: "اليوم المناسب للتواصل",
       contactTime: "الوقت المناسب للتواصل",
       notes: "ملاحظات إضافية",
-      consent: "أوافق على استخدام بياناتي للتواصل معي بشأن طلبي.",
+      consent: "تأكيد البيانات",
       submit: "إرسال البيانات",
       sending: "جارٍ الإرسال…",
       choose: "اختر…",
@@ -87,10 +87,13 @@ const CONFIG = {
       chooseTime: "اختر الوقت",
       am: "ص",
       pm: "م",
-      successTitle: "تم استلام بياناتك بنجاح",
-      successText: "شكرًا لك، سيتم التواصل معك في الوقت الذي اخترته.",
-      newEntry: "تسجيل جديد",
+      successTitle: "تم استلام طلب الحجز بنجاح",
+      successText: "شكرًا لك، سيتم التواصل معك في الوقت الذي اخترته لتأكيد الموعد.",
+      newEntry: "طلب جديد",
       langSwitch: "English",
+      contactTitle: "أو تواصل معنا مباشرة",
+      whatsapp: "تواصل عبر واتساب",
+      call: "اتصل بنا",
       // validation
       errNameRequired: "يرجى إدخال الاسم الكامل.",
       errNameShort: "يرجى إدخال الاسم الكامل بشكل صحيح.",
@@ -100,7 +103,7 @@ const CONFIG = {
       errService: "يرجى اختيار الخدمة المطلوبة.",
       errDay: "يرجى اختيار اليوم المناسب للتواصل.",
       errTime: "يرجى اختيار الوقت المناسب للتواصل.",
-      errConsent: "يجب الموافقة على استخدام البيانات لإتمام التسجيل.",
+      errConsent: "يرجى تأكيد البيانات لإتمام الطلب.",
       errSummary: "يرجى تصحيح الحقول المحددة ثم إعادة المحاولة.",
       // submission
       errNotConfigured: "تعذّر إرسال البيانات: لم يتم ربط النموذج بقاعدة البيانات بعد. يرجى التواصل مع إدارة العيادة.",
@@ -109,8 +112,8 @@ const CONFIG = {
       errFailed: "عذرًا، لم يتم حفظ بياناتك بسبب خطأ في الخادم. يرجى المحاولة مرة أخرى."
     },
     en: {
-      pageTitle: "Customer Registration | Passion Clinics",
-      title: "Customer Registration",
+      pageTitle: "Book an Appointment | Passion Clinics",
+      title: "Book an Appointment",
       subtitle: "Please fill in the following details.",
       fullName: "Full Name",
       mobile: "Mobile Number",
@@ -121,7 +124,7 @@ const CONFIG = {
       contactDay: "Preferred Contact Day",
       contactTime: "Preferred Contact Time",
       notes: "Additional Notes",
-      consent: "I agree to the use of my data to contact me regarding my request.",
+      consent: "I confirm my details",
       submit: "Submit",
       sending: "Sending…",
       choose: "Select…",
@@ -130,10 +133,13 @@ const CONFIG = {
       chooseTime: "Select a time",
       am: "AM",
       pm: "PM",
-      successTitle: "Your details have been received",
-      successText: "Thank you. We will contact you at the time you selected.",
-      newEntry: "New registration",
+      successTitle: "Your booking request has been received",
+      successText: "Thank you. We will contact you at the time you selected to confirm your appointment.",
+      newEntry: "New request",
       langSwitch: "العربية",
+      contactTitle: "Or contact us directly",
+      whatsapp: "Chat on WhatsApp",
+      call: "Call us",
       errNameRequired: "Please enter your full name.",
       errNameShort: "Please enter a valid full name.",
       errMobileRequired: "Please enter your mobile number.",
@@ -142,7 +148,7 @@ const CONFIG = {
       errService: "Please select the requested service.",
       errDay: "Please select a preferred contact day.",
       errTime: "Please select a preferred contact time.",
-      errConsent: "You must agree to the data-use consent to continue.",
+      errConsent: "Please confirm your details to continue.",
       errSummary: "Please correct the highlighted fields and try again.",
       errNotConfigured: "Submission failed: the form is not connected to the data store yet. Please contact the clinic.",
       errTimeout: "The request timed out and your details were not confirmed as saved. Please try again.",
@@ -162,7 +168,6 @@ const CONFIG = {
   const els = {
     fullName: $("fullName"),
     mobile: $("mobile"),
-    email: $("email"),
     service: $("service"),
     contactDay: $("contactDay"),
     contactTime: $("contactTime"),
@@ -319,10 +324,6 @@ const CONFIG = {
       if (!v) return "errMobileRequired";
       return normalizeSaudiMobile(v) ? null : "errMobileInvalid";
     },
-    email() {
-      const v = els.email.value.trim();
-      return v && !isValidEmail(v) ? "errEmailInvalid" : null;
-    },
     service() { return els.service.value ? null : "errService"; },
     contactDay() { return els.contactDay.value ? null : "errDay"; },
     contactTime() { return els.contactTime.value ? null : "errTime"; },
@@ -417,7 +418,7 @@ const CONFIG = {
     return {
       fullName: els.fullName.value.trim().replace(/\s+/g, " "),
       mobile: normalizeSaudiMobile(els.mobile.value),
-      email: els.email.value.trim(),
+      email: "",
       service: els.service.value,
       contactDay: els.contactDay.value,
       contactTime: els.contactTime.value,
@@ -499,7 +500,7 @@ const CONFIG = {
       const el = els[name];
       const evt = el.tagName === "SELECT" || el.type === "checkbox" ? "change" : "blur";
       el.addEventListener(evt, () => {
-        if (name === "email" || el.value || el.checked || attempted) validateField(name);
+        if (el.value || el.checked || attempted) validateField(name);
       });
       el.addEventListener("input", () => {
         if (attempted || el.closest(".field").classList.contains("is-invalid")) validateField(name);
@@ -513,6 +514,13 @@ const CONFIG = {
     });
 
     $("newEntryBtn").addEventListener("click", resetForm);
+
+    // Snap Pixel: count WhatsApp / call clicks as separate custom events
+    const trackClick = (eventName, desc) => {
+      try { if (typeof window.snaptr === "function") window.snaptr("track", eventName, { description: desc }); } catch (_) {}
+    };
+    $("waBtn").addEventListener("click", () => trackClick("CUSTOM_EVENT_1", "whatsapp_click"));
+    $("callBtn").addEventListener("click", () => trackClick("CUSTOM_EVENT_2", "call_click"));
 
     $("langToggle").addEventListener("click", () => {
       lang = lang === "ar" ? "en" : "ar";
