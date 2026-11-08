@@ -380,6 +380,20 @@ const CONFIG = {
     submitLabel.textContent = on ? t("sending") : t("submit");
   }
 
+  /** Snap Pixel conversion — fired ONLY after the sheet confirms the row was saved. */
+  function trackConversion(payload) {
+    try {
+      if (typeof window.snaptr === "function") {
+        window.snaptr("track", "SIGN_UP", {
+          sign_up_method: "registration_form",
+          item_category: payload.service
+        });
+      }
+    } catch (err) {
+      console.warn("Snap Pixel event failed:", err);
+    }
+  }
+
   function showSuccess() {
     hideAlert();
     form.hidden = true;
@@ -463,6 +477,7 @@ const CONFIG = {
       // A 202 "Accepted" (flow only queued) is NOT treated as success.
       if (res.status === 200 && body && body.ok === true) {
         showSuccess();
+        trackConversion(payload);
       } else {
         console.error("Submission not confirmed:", res.status, body);
         showAlert("errFailed");
