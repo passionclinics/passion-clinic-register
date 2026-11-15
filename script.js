@@ -415,8 +415,27 @@ const CONFIG = {
     submitLabel.textContent = on ? t("sending") : t("submit");
   }
 
-  /** Snap Pixel conversion — fired ONLY after the sheet confirms the row was saved. */
+  /** Google Tag Manager: push an event to the dataLayer (no personal data). */
+  function pushDataLayer(data) {
+    try {
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push(data);
+    } catch (err) {
+      console.warn("dataLayer push failed:", err);
+    }
+  }
+
+  /** Conversion (GTM + Snap Pixel) — fired ONLY after the sheet confirms the row was saved. */
   function trackConversion(payload) {
+    pushDataLayer({
+      event: "generate_lead",
+      form_id: "registration_form",
+      service: payload.service,
+      services_count: payload.services.length,
+      contact_day: payload.contactDay,
+      contact_time: payload.contactTime,
+      language: payload.language
+    });
     try {
       if (typeof window.snaptr === "function") {
         window.snaptr("track", "SIGN_UP", {
@@ -555,8 +574,14 @@ const CONFIG = {
     const trackClick = (eventName, desc) => {
       try { if (typeof window.snaptr === "function") window.snaptr("track", eventName, { description: desc }); } catch (_) {}
     };
-    $("waBtn").addEventListener("click", () => trackClick("CUSTOM_EVENT_1", "whatsapp_click"));
-    $("callBtn").addEventListener("click", () => trackClick("CUSTOM_EVENT_2", "call_click"));
+    $("waBtn").addEventListener("click", () => {
+      trackClick("CUSTOM_EVENT_1", "whatsapp_click");
+      pushDataLayer({ event: "whatsapp_click", language: lang });
+    });
+    $("callBtn").addEventListener("click", () => {
+      trackClick("CUSTOM_EVENT_2", "call_click");
+      pushDataLayer({ event: "call_click", language: lang });
+    });
 
     $("langToggle").addEventListener("click", () => {
       lang = lang === "ar" ? "en" : "ar";
